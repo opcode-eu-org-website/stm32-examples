@@ -121,3 +121,4 @@ clean:
 
 install: program.bin
 	stm32flash -w $< $(SERIAL)
+	stm32flash -g 0x0 $(SERIAL)
