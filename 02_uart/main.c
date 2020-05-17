@@ -1,5 +1,5 @@
 /*
- * STM32 - ćwiczenie 1, migająca dioda LED
+ * STM32 - ćwiczenie 3, UART
  * projekt ,,Python w Elektronicznej Sieci''
  * Krzysztof Lasocki <krz.lasocki@gmail.com>
  */
