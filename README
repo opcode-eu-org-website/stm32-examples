@@ -1,0 +1,13 @@
+Repozytorium zawiera przykłady kodu w C na potrzeby kursu ,,Python w
+Elektronicznej Sieci''
+
+Skrypt znajduje się tutaj:
+http://ciekawi.icm.edu.pl/materialy/edycja_XI/PwES_12-stm32.pdf
+
+Repozytorium podzielone jest na podkatalogi. Każdy z nich to oddzielne
+ćwiczenie, zaznajamiające z daną funkcjonalnością mikrokontrolera.
+
+Należy mieć zainstalowaną bibliotekę libopencm3 i wskazać na jej
+położenie za pomocą symlinku. Domyślnie znajduje się ona w
+../libopencm3-master.
+
