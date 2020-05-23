@@ -6,3 +6,4 @@
 *.srec
 *.list
 *.map
+generated.stm32*

@@ -116,7 +116,7 @@ flash: $(BINARY).flash
 clean:
 	@#printf "  CLEAN\n"
 	$(RM) $(OBJS)
-	$(RM) *.o *.d *.elf *.bin *.hex *.srec *.list *.map
+	$(RM) *.o *.d *.elf *.bin *.hex *.srec *.list *.map generated.*
 
 
 install: program.bin
