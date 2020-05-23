@@ -23,14 +23,6 @@
 
 #define SLAVE_ADDR 0x0F
 
-void HardFault_Handler(void){
-  printf("HFH!!\n");
-  while(1){
-    gpio_toggle(GPIOC, GPIO13);
-    gpio_toggle(GPIOC, GPIO14);
-  }
-  
-}
 
 uint32_t slavebyte;
 
@@ -38,51 +30,29 @@ void i2c2_ev_isr(void){
   
   uint32_t sr1, sr2;
 
-   sr1 = I2C_SR1(I2C2);
+  sr1 = I2C_SR1(I2C2);
 
-  
-
-
-
-   
-   // Address matched (Slave)
-   if (sr1 & I2C_SR1_ADDR){
+  // Address matched (Slave)
+  if (sr1 & I2C_SR1_ADDR){
        
-        //Clear the ADDR sequence by reading SR2.
-        sr2 = I2C_SR2(I2C2);
-        (void) sr2;
+    //Clear the ADDR sequence by reading SR2.
+    sr2 = I2C_SR2(I2C2);
+    (void) sr2;
 	
 	
-   }
-   //Master write request
-   else if(sr1 & I2C_SR1_RxNE){
-     gpio_toggle(GPIOC, GPIO13);
-     gpio_toggle(GPIOC, GPIO13);
+  }
+  //Master write request
+  else if(sr1 & I2C_SR1_RxNE){
+    slavebyte = I2C_DR(I2C2);
+    slavebyte *= 2;
 
-     
-     slavebyte = I2C_DR(I2C2);
-     slavebyte *= 2;
-
-     I2C_CR1(I2C2) &= ~I2C_CR1_STOP;
-   }
-   //Master read request
-   if ((sr1 & I2C_SR1_TxE)){
-     gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-	gpio_toggle(GPIOC, GPIO14);
-
-     
-     //i2c_send_data(I2C2, slavebyte);
-     I2C_DR(I2C2) = slavebyte;
-     I2C_CR1(I2C2) |= I2C_CR1_STOP;
-   }
+    I2C_CR1(I2C2) &= ~I2C_CR1_STOP;
+  }
+  //Master read request
+  if ((sr1 & I2C_SR1_TxE)){
+    I2C_DR(I2C2) = slavebyte;
+    I2C_CR1(I2C2) |= I2C_CR1_STOP;
+  }
 }
 
 
@@ -125,24 +95,12 @@ void i2c_setup(){
 }
 
 void i2c_send_write(uint32_t peryf, uint8_t dane){
-  /* gpio_clear(GPIOC, GPIO13);
-  gpio_set(GPIOC, GPIO13);
-  gpio_clear(GPIOC, GPIO13);
-  gpio_set(GPIOC, GPIO13);
-  gpio_clear(GPIOC, GPIO13);
-  gpio_set(GPIOC, GPIO13);
-  gpio_clear(GPIOC, GPIO13);*/
-  
-  
-  
   i2c_send_start(peryf);
   // Czekaj na wysłanie startu
   while (!((I2C_SR1(peryf) & I2C_SR1_SB)
 	   & (I2C_SR2(peryf) & (I2C_SR2_MSL | I2C_SR2_BUSY))));
   
   i2c_send_7bit_address(peryf, SLAVE_ADDR, I2C_WRITE);
-
-
   //Czekaj na wysłanie adresu
   while (!(I2C_SR1(peryf) & I2C_SR1_ADDR));
   (void) I2C_SR2(peryf); //Wyczyść EV6
@@ -150,29 +108,13 @@ void i2c_send_write(uint32_t peryf, uint8_t dane){
   
   i2c_send_data(peryf, dane);
 
+  while (!(I2C_SR1(peryf) & (I2C_SR1_BTF))); //czekaj na wyslanie danych
 
-  while (!(I2C_SR1(peryf) & (I2C_SR1_BTF))) gpio_toggle(GPIOC, GPIO13); //czekaj na wyslanie danych
   i2c_send_stop(peryf);
-  
-  /*gpio_clear(GPIOC, GPIO14);
-  gpio_set(GPIOC, GPIO14);
-  gpio_clear(GPIOC, GPIO14);
-  gpio_set(GPIOC, GPIO14);
-  gpio_clear(GPIOC, GPIO14);
-  gpio_set(GPIOC, GPIO14);
-  gpio_clear(GPIOC, GPIO14);*/
 }
 
 
 uint8_t i2c_send_read(uint32_t peryf){
-  gpio_clear(GPIOC, GPIO13);
-  gpio_set(GPIOC, GPIO13);
-  gpio_clear(GPIOC, GPIO13);
-  gpio_set(GPIOC, GPIO13);
-  gpio_clear(GPIOC, GPIO13);
-  gpio_set(GPIOC, GPIO13);
-  gpio_clear(GPIOC, GPIO13);
-  
   uint8_t dane;
   
   i2c_send_start(peryf);
@@ -181,30 +123,18 @@ uint8_t i2c_send_read(uint32_t peryf){
 	   & (I2C_SR2(peryf) & (I2C_SR2_MSL | I2C_SR2_BUSY))));
   
   i2c_send_7bit_address(peryf, SLAVE_ADDR, I2C_READ);
-  //  I2C_DR(peryf) = 0x55;
 
   //Czekaj na wysłanie adresu
   while (!(I2C_SR1(peryf) & I2C_SR1_ADDR));
   (void) I2C_SR2(peryf); //Wyczyść EV6
 
-
-  while (!(I2C_SR1(peryf) & I2C_SR1_RxNE)) {gpio_toggle(GPIOC, GPIO14); gpio_toggle(GPIOC, GPIO14);}
-  
+  //Czekaj aż otrzymasz 1 bit danych
+  while (!(I2C_SR1(peryf) & I2C_SR1_RxNE));
   dane = i2c_get_data(peryf);
-  
-
   
  
   i2c_send_stop(peryf);
 
-  gpio_clear(GPIOC, GPIO14);
-  gpio_set(GPIOC, GPIO14);
-  gpio_clear(GPIOC, GPIO14);
-  gpio_set(GPIOC, GPIO14);
-  gpio_clear(GPIOC, GPIO14);
-  gpio_set(GPIOC, GPIO14);
-  gpio_clear(GPIOC, GPIO14);
-  
   return dane;
 }
 
@@ -222,20 +152,19 @@ int main(){
 
   }
 
-  printf("SCB_VTOR is");
-  printf("%lx\n", SCB_VTOR);
+  printf("SCB_VTOR jest ");
+  printf("%08lx\n", SCB_VTOR);
   SCB_VTOR = 0x08000000;
   printf("**** zmieniam SCB_VTOR\n");
-  printf("SCB_VTOR is");
-  printf("%lx\n", SCB_VTOR);
+  printf("SCB_VTOR jest ");
+  printf("%08lx\n", SCB_VTOR);
 
   
   uint8_t k = 0;
   i2c_setup();
-  printf("po i2c setup\n");
 
   while(1){
-    for (int i = 0; i < 45000; i++) __asm__("nop");
+    for (int i = 0; i < 500000; i++) __asm__("nop");
     
     printf("Wysylam %d\n", k);
     i2c_send_write(I2C1, k);    
