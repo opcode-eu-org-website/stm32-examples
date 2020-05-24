@@ -14,38 +14,35 @@
 # update 01.04.2020 polprog: added -mcpu=cortex-m3 -mthumb to LDFLAGS as well
 #                   to make sure newlib functions are being linked in with the
 #                   correct instruction encoding
+# update 24.05.2020 rrp: remove unnused and redundant variables, use variables from
+#                   included libopencm3 makefiles to set platform depended info,
+#                   add `info` target
 #
 # The contents of this file are public domain work.
 ########################################
 
+# Serial device for stm32flash
+SERIAL ?= /dev/ttyUSB0
 
-SERIAL = /dev/ttyUSB0
+# Device specific things
+DEVICE ?= stm32f103c8t6
 
-#what is the main file 
+# LibopenCM3 location
+OPENCM3_DIR ?= ../libopencm3
+
+# ARM toolchain path
+TOOLCHAIN_PATH ?= /usr/bin/
+
+
+# what is the main file 
 BINARY = program
-
-
 
 CFILES = $(wildcard *.c)
 HFILES = $(wildcard *.h)
 OBJS = $(CFILES:%.c=%.o)
 
-#LibopenCM3 location
-OPENCM3_DIR = libopencm3
-SRCLIBDIR = $(OPENCM3_DIR)
-INCLUDE_DIR = $(OPENCM3_DIR)/include
-LIB_DIR = $(OPENCM3_DIR)/lib
 
-
-OPENOCD_SCRIPTS_DIR = /usr/share/openocd/scripts
-
-# Device specific things
-DEVICE = stm32f103c8t6
-
-toolchainPath ?= /usr/bin/
-
-PREFIX		?= $(toolchainPath)arm-none-eabi
-
+PREFIX		?= $(TOOLCHAIN_PATH)arm-none-eabi
 CC		:= $(PREFIX)-gcc
 LD		:= $(PREFIX)-gcc
 AR		:= $(PREFIX)-ar
@@ -55,35 +52,19 @@ OBJDUMP		:= $(PREFIX)-objdump
 GDB		:= $(PREFIX)-gdb
 
 
-CFLAGS = 
-#with thanks to libopencm3 makefile
 CFLAGS += -g
-CFLAGS += -Ilibopencm3/include/
 CFLAGS += -Wextra -Wshadow -Wimplicit-function-declaration -Wredundant-decls 
+CFLAGS += -Wall -Wundef
 CFLAGS += -fno-common -ffunction-sections -fdata-sections
 CFLAGS += -MD
-CFLAGS += -Wall -Wundef
-CFLAGS += -mcpu=cortex-m3 -mthumb
-CFLAGS += -T $(LDSCRIPT)
 
-#Includes
-CFLAGS += -I $(INCLUDE_DIR)
+LDFLAGS += --static -nostartfiles
+LDFLAGS += -T$(LDSCRIPT)
+LDFLAGS += -Wl,-Map=$(*).map
+LDFLAGS += -Wl,--gc-sections
 
-
-#######  LD Script #################
-# libopencm3 makefile that does the ldscript
-# uses libopencm3 to make a .ld file for the specified device
-LDFLAGS		?= 
-LDFLAGS		+= --static -nostartfiles
-LDFLAGS		+= -L$(LIB_DIR)
-LDFLAGS		+= -T$(LDSCRIPT)
-LDFLAGS		+= -Wl,-Map=$(*).map
-LDFLAGS		+= -Wl,--gc-sections
-
-
-LDLIBS		+= -lopencm3_stm32f1
-LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group 
-LDLIBS          += -lm -mcpu=cortex-m3 -mthumb
+LDLIBS += -lm
+LDLIBS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group 
 
 
 .SUFFIXES: .elf .bin .hex .srec .list .map .images
@@ -91,14 +72,26 @@ LDLIBS          += -lm -mcpu=cortex-m3 -mthumb
 .SECONDARY:
 
 all: elf bin
-
-include $(OPENCM3_DIR)/mk/genlink-config.mk
-include $(OPENCM3_DIR)/mk/genlink-rules.mk
-
-
 elf: $(BINARY).elf
 bin: $(BINARY).bin
 flash: $(BINARY).flash
+
+# libopencm3 makefiles that generate .ld file for the specified device and:
+#  - set $(LDSCRIPT) variable and add rule to generate this file
+#  - update $(ARCH_FLAGS) variable (set -mcpu and other platform depended flags)
+#  - update $(CPPFLAGS) and $(LDFLAGS) variables (set -I and -L to libopencm3 dirs)
+#  - update $(LDLIBS) variable (add platform depended lib, see $(LIBNAME))
+include $(OPENCM3_DIR)/mk/genlink-config.mk
+include $(OPENCM3_DIR)/mk/genlink-rules.mk
+
+info:
+	@echo DEVICE=$(DEVICE)
+	@echo SERIAL=$(SERIAL)
+	@echo
+	@echo ARCH_FLAGS=$(ARCH_FLAGS)
+	@echo CPPFLAGS=$(CPPFLAGS)
+	@echo LDLIBS=$(LDLIBS)
+	@echo LDFLAGS=$(LDFLAGS)
 
 
 %.bin: %.elf
@@ -107,18 +100,17 @@ flash: $(BINARY).flash
 
 %.elf %.map: $(OBJS) $(HFILES) $(LDSCRIPT)
 	@#printf "  LD      $(*).elf\n"
-	$(LD) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $(BINARY).elf
+	$(LD) $(LDFLAGS) $(OBJS) $(LDLIBS) $(ARCH_FLAGS) -o $(BINARY).elf
 
 %.o: %.c
 	@#printf "  CC      $(*).c\n"
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $(*).o -c $(*).c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).c
 
 clean:
 	@#printf "  CLEAN\n"
 	$(RM) $(OBJS)
 	$(RM) *.o *.d *.elf *.bin *.hex *.srec *.list *.map generated.*
 
-
-install: program.bin
+install: $(BINARY).bin
 	stm32flash -w $< $(SERIAL)
 	stm32flash -g 0x0 $(SERIAL)
