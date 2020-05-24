@@ -3,10 +3,6 @@
  * projekt ,,Python w Elektronicznej Sieci''
  * Krzysztof Lasocki <krz.lasocki@gmail.com>
  */
-#ifndef STM32F1
-#define STM32F1
-#endif
-
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>

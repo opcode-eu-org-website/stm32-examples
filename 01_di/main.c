@@ -8,10 +8,6 @@
   Przycisk na A0 zgodnie ze schematem
  */
 
-#ifndef STM32F1
-#define STM32F1
-#endif
-
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
