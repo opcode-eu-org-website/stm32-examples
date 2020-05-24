@@ -42,7 +42,8 @@ void i2c2_ev_isr(void){
     slavebyte = I2C_DR(I2C2);
     slavebyte *= 2;
 
-    I2C_CR1(I2C2) &= ~I2C_CR1_STOP;
+    I2C_CR1(I2C2) = I2C_CR1(I2C2);
+
   }
   //Master read request
   if ((sr1 & I2C_SR1_TxE)){
