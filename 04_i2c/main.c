@@ -149,14 +149,8 @@ int main(){
 
   }
 
-  printf("SCB_VTOR jest ");
-  printf("%08lx\n", SCB_VTOR);
-  SCB_VTOR = 0x08000000;
-  printf("**** zmieniam SCB_VTOR\n");
-  printf("SCB_VTOR jest ");
-  printf("%08lx\n", SCB_VTOR);
+  SCB_VTOR = FLASH_BASE;
 
-  
   uint8_t k = 0;
   i2c_setup();
 

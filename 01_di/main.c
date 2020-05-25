@@ -17,15 +17,16 @@ int main(){
   rcc_periph_clock_enable(RCC_GPIOA);
   rcc_periph_clock_enable(RCC_GPIOC);
 
-  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ,
-		GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+  // Ustawienie pinu C13 w trybie wyjścia
+  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+
   //Ustawienie pinu A0 w trybie wejścia
-  gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-		GPIO_CNF_INPUT_FLOAT, GPIO0);
+  gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO0);
 
   int16_t stan_a;
+
   while(1){
-    for (int i = 0; i < 150000; i++) __asm__("nop");
+    // odczytaj wartość z portu A
     stan_a = gpio_port_read(GPIOA);
     // Przełącz stan pinu 13 w porcie C bazując na wejściu na porcie A
     if(stan_a & 0x01){
@@ -33,5 +34,7 @@ int main(){
     }else{
       gpio_clear(GPIOC, GPIO13);
     }
+    // czekamy chwilę ...
+    for (int i = 0; i < 150000; i++) __asm__("nop");
   }
 }

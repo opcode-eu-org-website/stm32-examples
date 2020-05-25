@@ -4,5 +4,4 @@
 int _write(int fd, char *ptr, int len);
 void usart_setup(void);
 
-  
 #endif

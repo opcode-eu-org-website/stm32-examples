@@ -11,14 +11,12 @@ int main(){
   // Włączenie sygnału zegara dla portu C
   rcc_periph_clock_enable(RCC_GPIOC);
   // Ustawienie pinu C13 w trybie wyjścia
-  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ,
-		GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
 
   while(1){
     // Poczekaj chwilkę
     for (int i = 0; i < 150000; i++) __asm__("nop");
     // Przełącz stan pinu 13 w porcie C
     gpio_toggle(GPIOC, GPIO13);
-      
   }
 }

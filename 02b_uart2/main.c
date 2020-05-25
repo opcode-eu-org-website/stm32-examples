@@ -14,46 +14,41 @@
 
 #include "uart.h"
 int main() {
-	rcc_periph_clock_enable(RCC_GPIOC);
-	gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ,
-			GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
-	
-	// ustawiamy adres wektora przerwań
-	SCB_VTOR = 0x08000000;
-	
-	// aktywujemy przerwania z USART1
-	nvic_enable_irq(NVIC_USART1_IRQ);
-	// aktywujemy pin A10 jako wejściowy
-	gpio_set_mode(GPIOA, GPIO_MODE_INPUT,
-		      GPIO_CNF_INPUT_FLOAT, GPIO10);
-	// aktywujemy przerwania związane z odbiorem danych z USART1
-	USART_CR1(USART1) |= USART_CR1_RXNEIE;
-	usart_enable_rx_interrupt(USART1);
-	
-	// kontynujemy aktywację USART1 jak wcześniej - parametry transmisji, włączenie nadajnika, ...
-	usart_setup();
-	
-	// zmieniamy tryb na RX/RX
-	usart_set_mode(USART1, USART_MODE_TX_RX);
-	
-	
-	for(int j = 0; j < 10; j++) {
-		printf("...%d\n", j);
-		for (int i = 0; i < 150000; i++) __asm__("nop");
-		gpio_toggle(GPIOC, GPIO13);
-	}
-	
-	while(1) {
-		__asm__("nop");
-	}
+  rcc_periph_clock_enable(RCC_GPIOC);
+  gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13);
+  
+  // ustawiamy adres wektora przerwań na adres początkowy pamięci FLASH
+  SCB_VTOR = FLASH_BASE;
+  // aktywujemy przerwania z USART1
+  nvic_enable_irq(NVIC_USART1_IRQ);
+  // aktywujemy przerwania związane z odbiorem danych z USART1
+  usart_enable_rx_interrupt(USART1);
+  
+  // aktywujemy USART1 jak wcześniej - parametry transmisji, etc
+  usart_setup();
+  // aktywujemy pin A10 jako wejściowy
+  gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO10);
+  // zmieniamy tryb na RX/RX
+  usart_set_mode(USART1, USART_MODE_TX_RX);
+  
+  for(int j = 0; j < 10; j++) {
+    printf("...%d\n", j);
+    for (int i = 0; i < 150000; i++) __asm__("nop");
+    gpio_toggle(GPIOC, GPIO13);
+  }
+  
+  while(1) {
+    __asm__("nop");
+  }
 }
 
 void usart1_isr(void) {
-	if ( USART_SR(USART1) & USART_SR_RXNE ) { // przerwanie było z powodu odebranego bajtu
-		uint8_t data = usart_recv(USART1);
-		if (data%2)
-			gpio_set(GPIOC, GPIO13);
-		else
-			gpio_clear(GPIOC, GPIO13);
-	}
+  if ( USART_SR(USART1) & USART_SR_RXNE ) {
+    // przerwanie było z powodu odebranego bajtu
+    uint8_t data = usart_recv(USART1);
+    if (data%2)
+      gpio_set(GPIOC, GPIO13);
+    else
+      gpio_clear(GPIOC, GPIO13);
+  }
 }
