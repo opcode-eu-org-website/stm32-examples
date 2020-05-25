@@ -114,3 +114,6 @@ clean:
 install: $(BINARY).bin
 	stm32flash -w $< $(SERIAL)
 	stm32flash -g 0x0 $(SERIAL)
+
+run:
+	stm32flash -g 0x0 $(SERIAL)
