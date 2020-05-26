@@ -20,7 +20,7 @@
 #define SLAVE_ADDR 0x0F
 
 
-uint32_t slavebyte;
+uint8_t slavebyte;
 
 void i2c2_ev_isr(void){
   
