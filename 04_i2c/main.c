@@ -125,7 +125,7 @@ uint8_t i2c_send_read(uint32_t peryf){
   while (!(I2C_SR1(peryf) & I2C_SR1_ADDR));
   (void) I2C_SR2(peryf); //Wyczyść EV6
 
-  //Czekaj aż otrzymasz 1 bit danych
+  //Czekaj aż otrzymasz 1 bajt danych
   while (!(I2C_SR1(peryf) & I2C_SR1_RxNE));
   dane = i2c_get_data(peryf);
   

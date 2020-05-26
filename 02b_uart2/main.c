@@ -28,7 +28,7 @@ int main() {
   usart_setup();
   // aktywujemy pin A10 jako wejściowy
   gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO10);
-  // zmieniamy tryb na RX/RX
+  // zmieniamy tryb na TX/RX
   usart_set_mode(USART1, USART_MODE_TX_RX);
   
   for(int j = 0; j < 10; j++) {
