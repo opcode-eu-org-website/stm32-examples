@@ -67,6 +67,22 @@ LDLIBS += -lm
 LDLIBS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group 
 
 
+ifeq ("$(wildcard $(OPENCM3_DIR)/lib/libopencm3_stm32f1.a)","")
+$(info   Nie znaleziono biblioteki opencm3.)
+$(info   )
+$(info   Utwórz link $(abspath $(OPENCM3_DIR)))
+$(info   wskazujący na katalog z skompilowaną biblioteką opencm3, np.:)
+$(info     ln -s /opt/libopencm3 $(abspath $(OPENCM3_DIR)))
+$(info   lub użyj zmiennej OPENCM3_DIR aby wskazać położenie tego katalogu, np.:)
+$(info     export OPENCM3_DIR=/opt/libopencm3; make;)
+$(info   )
+$(info   Pamiętaj, że biblioteka opencm3 musi być skompilowana.)
+$(info   W tym celu, po zainstalowaniu wymaganych zależności,)
+$(info   będąc w jej katalogu należy wydać polecenie make)
+$(info   )
+$(error  Could NOT find libopencm3)
+endif
+
 .SUFFIXES: .elf .bin .hex .srec .list .map .images
 .SECONDEXPANSION:
 .SECONDARY:

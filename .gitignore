@@ -7,3 +7,4 @@
 *.list
 *.map
 generated.stm32*
+/libopencm3

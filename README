@@ -7,7 +7,10 @@ http://ciekawi.icm.edu.pl/materialy/edycja_XI/PwES_13-stm32.pdf
 Repozytorium podzielone jest na podkatalogi. Każdy z nich to oddzielne
 ćwiczenie, zaznajamiające z daną funkcjonalnością mikrokontrolera.
 
-Należy mieć zainstalowaną bibliotekę libopencm3 i wskazać na jej
-położenie za pomocą symlinku. Domyślnie znajduje się ona w
-../libopencm3-master.
+Przykłady z repozytorium oparte są o bibliotekę libopencm3:
+https://github.com/libopencm3/libopencm3
 
+Aby ich używać należy mieć pobraną i skompilowaną tę bibliotekę.
+Jej położenie można wskazać za linku symbolicznego o nazwie libopencm3,
+wskazującego na katalog z skompilowaną biblioteką libopencm3 lub
+zmiennej środowiskowej OPENCM3_DIR wskazującej na ten katalog.
