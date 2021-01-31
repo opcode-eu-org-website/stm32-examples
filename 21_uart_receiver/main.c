@@ -43,7 +43,8 @@ int main() {
 }
 
 void usart1_isr(void) {
-  if ( USART_SR(USART1) & USART_SR_RXNE ) {
+  uint32_t flags = USART_SR(USART1);
+  if ( flags & USART_SR_RXNE ) {
     // przerwanie było z powodu odebranego bajtu
     uint8_t data = usart_recv(USART1);
     if (data%2)
