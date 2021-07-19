@@ -56,9 +56,6 @@ int main() {
   timer_set_prescaler(TIM3, 32 - 1);
   timer_set_period(TIM3, 100 - 1);
   
-  // wyłączamy wszystkie 4 wyjścia związane z tym timerem
-  timer_disable_oc_output(TIM3, TIM_OC1 | TIM_OC2 | TIM_OC3 | TIM_OC4);
-  
   // konfigurujemy wyjście OC1 (dostępne domyślnie na PA6)
   //  nie jest czyszczone (OC1CE=0) przez zewnętrzny sygnał triggera (TRGI)
   timer_disable_oc_clear(TIM3, TIM_OC1);
