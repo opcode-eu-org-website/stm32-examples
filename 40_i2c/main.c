@@ -2,6 +2,9 @@
  * STM32 - ćwiczenie 5, I2C
  * projekt ,,Python w Elektronicznej Sieci''
  * Krzysztof Lasocki <krz.lasocki@gmail.com>
+ *
+ * opis działania I2C (znaczenie ACK, NACK, START, STOP, ...)
+ * dla dociekliwych: https://www.ti.com/lit/an/slva704/slva704.pdf
  */
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/stm32/rcc.h>
@@ -24,29 +27,34 @@
 uint8_t slavebyte;
 
 void i2c2_ev_isr(void){
-  uint32_t sr1, sr2;
+  uint16_t sr1, sr2;
 
   sr1 = I2C_SR1(I2C2);
+  printf("I2C ISR: sr1=0x%04x slavebyte=%d\n", sr1, slavebyte); // for demonstration / debug only
 
   // Address matched (Slave)
   if (sr1 & I2C_SR1_ADDR){
-    //Clear the ADDR sequence by reading SR2.
+    // Clear the ADDR sequence by reading SR2.
     sr2 = I2C_SR2(I2C2);
     (void) sr2;
   }
 
-  //Master write request
-  else if(sr1 & I2C_SR1_RxNE){
+  // Write request from master
+  if (sr1 & I2C_SR1_RxNE){
     slavebyte = I2C_DR(I2C2);
-    slavebyte *= 2;
-
-    I2C_CR1(I2C2) = I2C_CR1(I2C2);
+    printf("I2C ISR: received %d\n", slavebyte); // for demonstration / debug only
+    slavebyte *= 2; // slave logic is multiply by 2 ;)
   }
 
-  //Master read request
+  // Read request from master
   if ((sr1 & I2C_SR1_TxE)){
     I2C_DR(I2C2) = slavebyte;
-    I2C_CR1(I2C2) |= I2C_CR1_STOP;
+  }
+
+  // Stop sequence detected (Slave)
+  if (sr1 & I2C_SR1_STOPF){
+    // Clear by write I2C_CR1
+    I2C_CR1(I2C2) = I2C_CR1(I2C2);
   }
 }
 
