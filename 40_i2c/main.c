@@ -68,7 +68,7 @@ void i2c_setup(){
   /* I2C1 - master; SDA=B7, SCL=B6 */
   rcc_periph_clock_enable(RCC_I2C1);
 
-  i2c_reset(I2C1);
+  rcc_periph_reset_pulse(RST_I2C1);
   i2c_peripheral_disable(I2C1);
   i2c_set_speed(I2C1, i2c_speed_sm_100k, 8);
 
@@ -80,7 +80,7 @@ void i2c_setup(){
   /* I2C2 - slave; SDA=B11, SCL=B10 */
   rcc_periph_clock_enable(RCC_I2C2);
 
-  i2c_reset(I2C2);
+  rcc_periph_reset_pulse(RST_I2C2);
   i2c_peripheral_disable(I2C2);
   i2c_set_speed(I2C2, i2c_speed_sm_100k, 8);
 

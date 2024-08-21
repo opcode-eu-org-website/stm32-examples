@@ -4,7 +4,7 @@ STM-examples
 Repozytorium zawiera przykłady kodu w C na potrzeby kursu „Linux i Python w Elektronicznej Sieci”.
 
 Skrypt do zajęć z SMT32 (zawierający informacje o podłączeniu mikrokontrolera oraz opis poszczególnych przykładów znajduje się pod adresami:
-	http://www.opcode.eu.org/Podstawy_programowania_mikrokontrolerów_STM32.pdf oraz http://ciekawi.icm.edu.pl/lpes/stm32.pdf
+	http://www.opcode.eu.org/Podstawy_programowania_mikrokontrolerów_STM32.pdf oraz http://ciekawi.icm.edu.pl/lpes/LPES_12-stm32.pdf
 
 Przykłady zostały stworzone dla mikrokontrolera STM32F103, dostępnego np. na płytce "blue-pill".
 Możliwe jest ich uruchamianie / przenoszenie na inne mikrokontrolery wspierane przez libopencm3 (zobacz m.in. [info/gpio.md](info/gpio.md))
