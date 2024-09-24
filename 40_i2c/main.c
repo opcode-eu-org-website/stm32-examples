@@ -111,7 +111,7 @@ void i2c_send_write(uint32_t peryf, uint8_t dane){
 
   i2c_send_data(peryf, dane);
 
-  while (!(I2C_SR1(peryf) & (I2C_SR1_BTF))); // czekaj na wyslanie danych
+  while (!(I2C_SR1(peryf) & (I2C_SR1_BTF))); // czekaj na wysłanie danych
 
   i2c_send_stop(peryf);
 }
